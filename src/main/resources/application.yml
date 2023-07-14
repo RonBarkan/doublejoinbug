@@ -3,13 +3,24 @@ micronaut:
     name: doublejoinbug
 datasources:
   default:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5433/postgres
     username: postgres
-    password: ''
+    password: 'doublejoinbug'
     driver-class-name: org.postgresql.Driver
     db-type: postgres
     schema-generate: CREATE_DROP
     dialect: POSTGRES
+#datasources:
+#  default:
+#    url: jdbc:postgresql://localhost:5433/postgres
+#    username: postgres
+#    password: doublejoinbug
+#    driverClassName: org.postgresql.Driver
+#    schema: my_schema
+##    maximum-pool-size: 10
+##    minimum-idle: 2
+#    schema-generate: CREATE_DROP
+
 netty:
   default:
     allocator:
