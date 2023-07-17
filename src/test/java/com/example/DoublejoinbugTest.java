@@ -21,6 +21,7 @@ class DoublejoinbugTest {
 
     @BeforeEach
     void wipeTables() {
+      cTable.deleteAll();
       bTable.deleteAll();
       aTable.deleteAll();
     }
@@ -52,7 +53,14 @@ class DoublejoinbugTest {
       b2.setBProp("b2");
       bTable.save(b2);
 
-      List<A> as = aTable.findBlah(a.getAId());
+      List<A> as = aTable.findNPE(a.getAId());
       Assertions.assertEquals(1, as.size());
+      Assertions.assertEquals(2, as.get(0).b.size());
+      Assertions.assertEquals(1, as.get(0).c.size());
+
+      as = aTable.findIgnoreC(a.getAId());
+      Assertions.assertEquals(1, as.size());
+      Assertions.assertEquals(2, as.get(0).b.size());
+      Assertions.assertEquals(1, as.get(0).c.size());
     }
 }
