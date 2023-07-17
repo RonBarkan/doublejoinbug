@@ -1,31 +1,29 @@
-## Micronaut 3.9.4 Documentation
+# NPE when left outer joining two or more one-to-many tables with @Query
 
-- [User Guide](https://docs.micronaut.io/3.9.4/guide/index.html)
-- [API Reference](https://docs.micronaut.io/3.9.4/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/3.9.4/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+Micronaut Data throws an NPE when two or more one-to-many tables are joined with a custom query.\
+[Issue link](https://github.com/micronaut-projects/micronaut-data/issues/2363)
 
-- [Shadow Gradle Plugin](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow)
-- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
-- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-## Feature http-client documentation
+## Actual behavior
+```
+Caused by: java.lang.NullPointerException
+at java.base/java.util.Objects.requireNonNull(Objects.java:208)
+at io.micronaut.data.runtime.mapper.sql.SqlResultEntityTypeMapper.readChildren(SqlResultEntityTypeMapper.java:329)
+at io.micronaut.data.runtime.mapper.sql.SqlResultEntityTypeMapper.readChildren(SqlResultEntityTypeMapper.java:341)
+at io.micronaut.data.runtime.mapper.sql.SqlResultEntityTypeMapper.access$400(SqlResultEntityTypeMapper.java:76)
+at io.micronaut.data.runtime.mapper.sql.SqlResultEntityTypeMapper$2.processRow(SqlResultEntityTypeMapper.java:302)
+at io.micronaut.data.jdbc.operations.DefaultJdbcRepositoryOperations.findStream(DefaultJdbcRepositoryOperations.java:447)
+```
 
-- [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
+Alternatively, an entity queried from the database will not be populated as entity/ies.
 
+## Cause
+This materializes when there are two or more one-to-many left outer joins. When one of the outer joins is not null, the other is null AND there's more than one output row. An NPE will be thrown for such a case, except for the first row of the root entity.
 
-## Feature data-jdbc documentation
+In the above example, the query result set should be
 
-- [Micronaut Data JDBC documentation](https://micronaut-projects.github.io/micronaut-data/latest/guide/index.html#jdbc)
+|A | B | C |
+|-|-|-|
+|a1|b1|c1|
+|a1|b2|null|
 
-
-## Feature testcontainers documentation
-
-- [https://www.testcontainers.org/](https://www.testcontainers.org/)
-
-
-## Feature jdbc-hikari documentation
-
-- [Micronaut Hikari JDBC Connection Pool documentation](https://micronaut-projects.github.io/micronaut-sql/latest/guide/index.html#jdbc)
-
-
+The null is due to the left join of the custom query.
