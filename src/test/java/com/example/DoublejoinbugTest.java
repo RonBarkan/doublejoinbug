@@ -53,12 +53,12 @@ class DoublejoinbugTest {
       b2.setBProp("b2");
       bTable.save(b2);
 
-      List<A> as = aTable.findNPE(a.getAId());
+      List<A> as = aTable.findNPE(a.getAId());  // Currently, this will throw NPE
       Assertions.assertEquals(1, as.size());
       Assertions.assertEquals(2, as.get(0).b.size());
       Assertions.assertEquals(1, as.get(0).c.size());
 
-      as = aTable.findIgnoreC(a.getAId());
+      as = aTable.findIgnoreC(a.getAId());  // Currently, this will completely ignore C column
       Assertions.assertEquals(1, as.size());
       Assertions.assertEquals(2, as.get(0).b.size());
       Assertions.assertEquals(1, as.get(0).c.size());
